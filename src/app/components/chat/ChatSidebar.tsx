@@ -4,7 +4,6 @@ import {
   Bot,
   ChevronUp,
   CircleHelp,
-  Code2,
   Compass,
   Crown,
   Image,
@@ -50,15 +49,40 @@ const workspaceItems = [
   },
 ];
 
+interface ChatSidebarProps {
+  onNewChat: () => void;
+  onSelectChat: (chatId: string) => void;
+  activeChatId: string | null;
+}
+
 const recentChats = [
-  "Build a React dashboard",
-  "Portfolio improvement ideas",
-  "Debug authentication",
-  "Next.js App Router",
-  "REST API architecture",
+  {
+    id: "chat-1",
+    title: "Build a React dashboard",
+  },
+  {
+    id: "chat-2",
+    title: "Portfolio improvement ideas",
+  },
+  {
+    id: "chat-3",
+    title: "Debug authentication",
+  },
+  {
+    id: "chat-4",
+    title: "Next.js App Router",
+  },
+  {
+    id: "chat-5",
+    title: "REST API architecture",
+  },
 ];
 
-export default function ChatSidebar() {
+export default function ChatSidebar({
+  onNewChat,
+  onSelectChat,
+  activeChatId,
+}: ChatSidebarProps) {
   return (
     <Sidebar
       collapsible="icon"
@@ -90,11 +114,12 @@ export default function ChatSidebar() {
               tooltip="New Chat"
               className="h-11 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 px-3 text-white shadow-md shadow-violet-500/20 transition-all hover:scale-[1.01] hover:from-violet-700 hover:via-indigo-700 hover:to-fuchsia-600 hover:text-white"
             >
-              <button type="button">
+              <button type="button" onClick={onNewChat}>
                 <Plus className="size-4" />
+
                 <span className="font-medium">New Chat</span>
 
-                <kbd className="ml-auto hidden  rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold group-data-[collapsible=icon]:hidden sm:inline">
+                <kbd className="ml-auto hidden rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold group-data-[collapsible=icon]:hidden sm:inline">
                   ⌘ K
                 </kbd>
               </button>
@@ -150,22 +175,22 @@ export default function ChatSidebar() {
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {recentChats.map((chat, index) => (
-                <SidebarMenuItem key={chat}>
+              {recentChats.map((chat) => (
+                <SidebarMenuItem key={chat.id}>
                   <SidebarMenuButton
                     asChild
-                    tooltip={chat}
-                    className={`h-9 rounded-lg px-3 text-muted-foreground transition-colors hover:bg-violet-50 hover:text-foreground dark:hover:bg-violet-950/30 ${
-                      index === 0
-                        ? "bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300"
-                        : ""
-                    }`}
+                    tooltip={chat.title}
+                    isActive={activeChatId === chat.id}
+                    className="h-10 rounded-lg px-3 transition-colors hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/30 dark:hover:text-violet-300"
                   >
-                    <button type="button">
-                      <MessageSquare className="size-3.5 shrink-0" />
+                    <button
+                      type="button"
+                      onClick={() => onSelectChat(chat.id)}
+                    >
+                      <MessageSquare className="size-4 shrink-0" />
 
-                      <span className="truncate text-xs">
-                        {chat}
+                      <span className="min-w-0 truncate">
+                        {chat.title}
                       </span>
                     </button>
                   </SidebarMenuButton>

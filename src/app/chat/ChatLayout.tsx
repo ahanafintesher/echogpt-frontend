@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import ChatHeader from "../components/chat/ChatHeader";
-import ChatEmptyState from "../components/chat/ChatEmptyState";
-import UserMessage from "../components/chat/UserMessage";
-import AssistantMessage from "../components/chat/AssistantMessage";
-import TypingIndicator from "../components/chat/TypingIndicator";
-import MessageInput from "../components/chat/MessageInput";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useSidebar } from "@/components/ui/sidebar";
 
+import AssistantMessage from "../components/chat/AssistantMessage";
+import ChatEmptyState from "../components/chat/ChatEmptyState";
+import ChatHeader from "../components/chat/ChatHeader";
+import ChatMessages, {
+  type Message,
+} from "../components/chat/ChatMessages";
+import MessageInput from "../components/chat/MessageInput";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
+interface ChatLayoutProps {
+  messages: Message[];
+  onMessagesChange: (messages: Message[]) => void;
+  title?: string;
 }
 
 const mockResponses = [
@@ -22,12 +24,27 @@ const mockResponses = [
   "Sure! I understand what you're trying to achieve. Let me walk you through the solution step by step.",
 ];
 
-export default function ChatLayout() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatLayout({
+  messages,
+  onMessagesChange,
+  title = "New Chat",
+}: ChatLayoutProps) {
   const [isTyping, setIsTyping] = useState(false);
+
   const { toggleSidebar } = useSidebar();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const responseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const clearResponseTimeout = useCallback(() => {
+    if (responseTimeoutRef.current) {
+      clearTimeout(responseTimeoutRef.current);
+      responseTimeoutRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -35,9 +52,34 @@ export default function ChatLayout() {
     });
   }, [messages, isTyping]);
 
-  const handleSend = (content: string,
-    
-  ) => {
+  const handleStop = () => {
+    clearResponseTimeout();
+    setIsTyping(false);
+  };
+
+  const generateResponse = (delay: number) => {
+    clearResponseTimeout();
+
+    setIsTyping(true);
+
+    responseTimeoutRef.current = setTimeout(() => {
+      const response =
+        mockResponses[Math.floor(Math.random() * mockResponses.length)];
+
+      const assistantMessage: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: response,
+      };
+
+      onMessagesChange([...messages, assistantMessage]);
+
+      setIsTyping(false);
+      responseTimeoutRef.current = null;
+    }, delay);
+  };
+
+  const handleSend = (content: string) => {
     const trimmedContent = content.trim();
 
     if (!trimmedContent || isTyping) return;
@@ -48,24 +90,11 @@ export default function ChatLayout() {
       content: trimmedContent,
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setIsTyping(true);
+    const updatedMessages = [...messages, userMessage];
 
-    setTimeout(() => {
-      const response =
-        mockResponses[
-          Math.floor(Math.random() * mockResponses.length)
-        ];
+    onMessagesChange(updatedMessages);
 
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: response,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsTyping(false);
-    }, 1400);
+    generateResponse(1400);
   };
 
   const handlePromptSelect = (prompt: string) => {
@@ -75,66 +104,66 @@ export default function ChatLayout() {
   const handleRegenerate = () => {
     if (isTyping || messages.length === 0) return;
 
+    const lastAssistantIndex = [...messages]
+      .map((message) => message.role)
+      .lastIndexOf("assistant");
+
+    if (lastAssistantIndex === -1) return;
+
+    clearResponseTimeout();
     setIsTyping(true);
 
-    setTimeout(() => {
+    responseTimeoutRef.current = setTimeout(() => {
       const response =
-        mockResponses[
-          Math.floor(Math.random() * mockResponses.length)
-        ];
+        mockResponses[Math.floor(Math.random() * mockResponses.length)];
 
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
+      const updatedMessages = [...messages];
+
+      updatedMessages[lastAssistantIndex] = {
+        ...updatedMessages[lastAssistantIndex],
         content: response,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      onMessagesChange(updatedMessages);
+
       setIsTyping(false);
+      responseTimeoutRef.current = null;
     }, 1200);
   };
+
+  useEffect(() => {
+    return () => {
+      clearResponseTimeout();
+    };
+  }, [clearResponseTimeout]);
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background">
       <ChatHeader
-  title="New Chat"
-  onToggleSidebar={toggleSidebar}
-/>
+        title={title}
+        onToggleSidebar={toggleSidebar}
+      />
 
       <main className="relative min-h-0 flex-1 overflow-y-auto">
         {messages.length === 0 ? (
           <ChatEmptyState onPromptSelect={handlePromptSelect} />
         ) : (
-          <div className="mx-auto w-full max-w-4xl">
-            {messages.map((message) => {
-              if (message.role === "user") {
-                return (
-                  <UserMessage
-                    key={message.id}
-                    content={message.content}
-                  />
-                );
-              }
-
-              return (
-                <AssistantMessage
-                  key={message.id}
-                  content={message.content}
-                  onRegenerate={handleRegenerate}
-                />
-              );
-            })}
-
-            {isTyping && <TypingIndicator />}
+          <>
+            <ChatMessages
+              messages={messages}
+              isTyping={isTyping}
+              onRegenerate={handleRegenerate}
+            />
 
             <div ref={messagesEndRef} className="h-4" />
-          </div>
+          </>
         )}
       </main>
 
       <MessageInput
         onSend={handleSend}
-  isGenerating={isTyping}
+        onStop={handleStop}
+        isGenerating={isTyping}
       />
     </div>
   );
