@@ -74,8 +74,10 @@ export default function ChatHeader({
               variant="ghost"
               size="icon"
               onClick={onToggleSidebar}
-              className="size-9 shrink-0 rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
+              className="md:flex"
+              aria-label="Toggle sidebar"
             >
+              
               <PanelLeft className="size-[18px]" />
               <span className="sr-only">Open sidebar</span>
             </Button>
@@ -121,18 +123,13 @@ export default function ChatHeader({
                 <span className="relative inline-flex size-2.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" />
               </span>
 
-              <span className="max-w-[90px] truncate">
-                {activeModel?.name}
-              </span>
+              <span className="max-w-[90px] truncate">{activeModel?.name}</span>
 
               <ChevronDown className="size-3.5 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent
-            align="center"
-            className="w-64 rounded-2xl p-2"
-          >
+          <DropdownMenuContent align="center" className="w-64 rounded-2xl p-2">
             <div className="px-2 py-2">
               <p className="text-xs font-medium text-muted-foreground">
                 Select model
@@ -156,9 +153,7 @@ export default function ChatHeader({
                     </p>
                   </div>
 
-                  {model.active && (
-                    <Check className="size-4 text-violet-500" />
-                  )}
+                  {model.active && <Check className="size-4 text-violet-500" />}
                 </div>
               </DropdownMenuItem>
             ))}
@@ -197,10 +192,7 @@ export default function ChatHeader({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent
-            align="end"
-            className="w-48 rounded-2xl p-2"
-          >
+          <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2">
             <DropdownMenuItem className="cursor-pointer gap-2 rounded-xl">
               <Pencil className="size-4" />
               Rename chat

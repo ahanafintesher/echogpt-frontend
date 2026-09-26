@@ -7,7 +7,7 @@ import UserMessage from "../components/chat/UserMessage";
 import AssistantMessage from "../components/chat/AssistantMessage";
 import TypingIndicator from "../components/chat/TypingIndicator";
 import MessageInput from "../components/chat/MessageInput";
-
+import { useSidebar } from "@/components/ui/sidebar";
 
 
 interface Message {
@@ -25,6 +25,7 @@ const mockResponses = [
 export default function ChatLayout() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const { toggleSidebar } = useSidebar();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +96,10 @@ export default function ChatLayout() {
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background">
-      <ChatHeader title="New Chat" />
+      <ChatHeader
+  title="New Chat"
+  onToggleSidebar={toggleSidebar}
+/>
 
       <main className="relative min-h-0 flex-1 overflow-y-auto">
         {messages.length === 0 ? (
