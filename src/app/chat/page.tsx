@@ -1,12 +1,16 @@
-import ChatWelcome from "../components/chat/ChatWelcome";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+
 import ChatLayout from "./ChatLayout";
-
-
+import ChatSidebar from "../components/chat/ChatSidebar";
 
 export default function ChatPage() {
   return (
-    <ChatLayout>
-      <ChatWelcome />
-    </ChatLayout>
+    <SidebarProvider>
+      <ChatSidebar />
+
+      <SidebarInset className="min-w-0">
+        <ChatLayout />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

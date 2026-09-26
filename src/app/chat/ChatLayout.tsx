@@ -34,7 +34,9 @@ export default function ChatLayout() {
     });
   }, [messages, isTyping]);
 
-  const handleSend = (content: string) => {
+  const handleSend = (content: string,
+    
+  ) => {
     const trimmedContent = content.trim();
 
     if (!trimmedContent || isTyping) return;
@@ -92,7 +94,7 @@ export default function ChatLayout() {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background">
       <ChatHeader title="New Chat" />
 
       <main className="relative min-h-0 flex-1 overflow-y-auto">
@@ -128,7 +130,7 @@ export default function ChatLayout() {
 
       <MessageInput
         onSend={handleSend}
-        disabled={isTyping}
+  isGenerating={isTyping}
       />
     </div>
   );
