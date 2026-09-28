@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const benefits = [
   "Ask AI from any webpage",
@@ -105,6 +106,7 @@ export default function ExtensionShowcase() {
 
             {/* CTA */}
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link href={"/extension"}>
               <Button
                 size="lg"
                 className="group h-12 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 px-6 text-white shadow-lg shadow-violet-500/20 hover:shadow-xl hover:shadow-violet-500/25"
@@ -113,6 +115,7 @@ export default function ExtensionShowcase() {
                 <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
 
+              </Link>
               <Button
                 size="lg"
                 variant="outline"

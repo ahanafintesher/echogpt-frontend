@@ -64,7 +64,7 @@ export default function ExtensionHeader({
       {/* Right */}
       <div className="flex items-center gap-1">
         {/* Online status */}
-        <div
+        {/* <div
           className="mr-1 hidden items-center gap-1.5 rounded-full border border-border/50 bg-muted/30 px-2 py-1 sm:flex"
           title="EchoGPT is online"
         >
@@ -72,7 +72,7 @@ export default function ExtensionHeader({
           <span className="text-[9px] font-medium text-muted-foreground">
             Online
           </span>
-        </div>
+        </div> */}
 
         {/* New Chat */}
         <button
