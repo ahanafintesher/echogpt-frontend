@@ -88,6 +88,7 @@ export default function FAQ() {
 
   return (
     <section
+    id="faq"
       aria-labelledby={`${baseId}-heading`}
       className="relative isolate overflow-hidden border-t border-border/40 bg-background py-24 sm:py-28"
     >
