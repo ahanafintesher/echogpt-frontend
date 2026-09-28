@@ -4,10 +4,17 @@ import AssistantMessage from "./AssistantMessage";
 import TypingIndicator from "./TypingIndicator";
 import UserMessage from "./UserMessage";
 
+export interface MessageAttachment {
+  name: string;
+  type: string;
+  size: number;
+}
+
 export interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  attachments?: MessageAttachment[];
 }
 
 interface ChatMessagesProps {
@@ -25,7 +32,10 @@ export default function ChatMessages({
     <div className="mx-auto w-full max-w-4xl">
       {messages.map((message) =>
         message.role === "user" ? (
-          <UserMessage key={message.id} content={message.content} />
+          <UserMessage
+            key={message.id}
+            content={message.content}
+          />
         ) : (
           <AssistantMessage
             key={message.id}

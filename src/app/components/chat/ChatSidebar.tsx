@@ -29,6 +29,18 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
+interface Chat {
+  id: string;
+  title: string;
+}
+
+interface ChatSidebarProps {
+  chats: Chat[];
+  onNewChat: () => void;
+  onSelectChat: (chatId: string) => void;
+  activeChatId: string | null;
+}
+
 const workspaceItems = [
   {
     title: "Explore",
@@ -49,36 +61,8 @@ const workspaceItems = [
   },
 ];
 
-interface ChatSidebarProps {
-  onNewChat: () => void;
-  onSelectChat: (chatId: string) => void;
-  activeChatId: string | null;
-}
-
-const recentChats = [
-  {
-    id: "chat-1",
-    title: "Build a React dashboard",
-  },
-  {
-    id: "chat-2",
-    title: "Portfolio improvement ideas",
-  },
-  {
-    id: "chat-3",
-    title: "Debug authentication",
-  },
-  {
-    id: "chat-4",
-    title: "Next.js App Router",
-  },
-  {
-    id: "chat-5",
-    title: "REST API architecture",
-  },
-];
-
 export default function ChatSidebar({
+  chats,
   onNewChat,
   onSelectChat,
   activeChatId,
@@ -88,8 +72,8 @@ export default function ChatSidebar({
       collapsible="icon"
       className="border-r border-violet-100/80 dark:border-violet-950/40"
     >
-      {/* Logo */}
       <SidebarHeader className="px-3 pt-4">
+        {/* Logo */}
         <div className="flex items-center gap-3 px-2 py-2">
           <div className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-fuchsia-500 text-white shadow-lg shadow-violet-500/20">
             <Sparkles className="size-4" />
@@ -114,10 +98,15 @@ export default function ChatSidebar({
               tooltip="New Chat"
               className="h-11 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 px-3 text-white shadow-md shadow-violet-500/20 transition-all hover:scale-[1.01] hover:from-violet-700 hover:via-indigo-700 hover:to-fuchsia-600 hover:text-white"
             >
-              <button type="button" onClick={onNewChat}>
+              <button
+                type="button"
+                onClick={onNewChat}
+              >
                 <Plus className="size-4" />
 
-                <span className="font-medium">New Chat</span>
+                <span className="font-medium">
+                  New Chat
+                </span>
 
                 <kbd className="ml-auto hidden rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold group-data-[collapsible=icon]:hidden sm:inline">
                   ⌘ K
@@ -128,7 +117,6 @@ export default function ChatSidebar({
         </SidebarMenu>
       </SidebarHeader>
 
-      {/* Main content */}
       <SidebarContent className="px-2">
         {/* Workspace */}
         <SidebarGroup className="pt-5">
@@ -146,7 +134,7 @@ export default function ChatSidebar({
                     <SidebarMenuButton
                       asChild
                       tooltip={item.title}
-                      className="h-10 rounded-lg px-3 transition-colors hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/30 dark:hover:text-violet-300"
+                      className="h-10 rounded-lg transition-colors hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/30 dark:hover:text-violet-300"
                     >
                       <button type="button">
                         <Icon className="size-4" />
@@ -175,17 +163,19 @@ export default function ChatSidebar({
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {recentChats.map((chat) => (
+              {chats.map((chat) => (
                 <SidebarMenuItem key={chat.id}>
                   <SidebarMenuButton
                     asChild
                     tooltip={chat.title}
                     isActive={activeChatId === chat.id}
-                    className="h-10 rounded-lg px-3 transition-colors hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/30 dark:hover:text-violet-300"
+                    className="h-10 rounded-lg transition-colors hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-950/30 dark:hover:text-violet-300"
                   >
                     <button
                       type="button"
-                      onClick={() => onSelectChat(chat.id)}
+                      onClick={() =>
+                        onSelectChat(chat.id)
+                      }
                     >
                       <MessageSquare className="size-4 shrink-0" />
 
@@ -200,7 +190,7 @@ export default function ChatSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Upgrade card */}
+        {/* Upgrade */}
         <div className="mt-auto px-1 py-4 group-data-[collapsible=icon]:hidden">
           <div className="relative overflow-hidden rounded-2xl border border-violet-200/70 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-4 dark:border-violet-900/40 dark:from-violet-950/40 dark:via-background dark:to-fuchsia-950/20">
             <div className="absolute -right-6 -top-6 size-20 rounded-full bg-fuchsia-400/20 blur-2xl" />
@@ -230,7 +220,6 @@ export default function ChatSidebar({
         </div>
       </SidebarContent>
 
-      {/* Footer */}
       <SidebarFooter className="px-2 pb-3">
         <SidebarSeparator />
 
@@ -261,7 +250,6 @@ export default function ChatSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* User */}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild

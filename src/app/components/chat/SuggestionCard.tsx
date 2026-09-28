@@ -1,70 +1,56 @@
 "use client";
 
-import {
-  Brain,
-  Code2,
-  Lightbulb,
-  PenLine,
-} from "lucide-react";
+import { ArrowUpRight, type LucideIcon } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
+interface SuggestionCardProps {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  gradient: string;
+  iconColor: string;
+  onClick?: () => void;
+}
 
-const suggestions = [
-  {
-    title: "Write something",
-    description: "Create emails, articles, stories, and more.",
-    icon: PenLine,
-    gradient: "from-violet-500/15 to-fuchsia-500/10",
-  },
-  {
-    title: "Build with code",
-    description: "Debug, explain, or create your next project.",
-    icon: Code2,
-    gradient: "from-indigo-500/15 to-cyan-500/10",
-  },
-  {
-    title: "Analyze deeply",
-    description: "Break down complex ideas and find insights.",
-    icon: Brain,
-    gradient: "from-fuchsia-500/15 to-pink-500/10",
-  },
-  {
-    title: "Brainstorm ideas",
-    description: "Turn a rough thought into something useful.",
-    icon: Lightbulb,
-    gradient: "from-amber-500/15 to-orange-500/10",
-  },
-];
-
-export default function SuggestionCards() {
+export default function SuggestionCard({
+  title,
+  description,
+  icon: Icon,
+  gradient,
+  iconColor,
+  onClick,
+}: SuggestionCardProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {suggestions.map((suggestion) => {
-        const Icon = suggestion.icon;
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative min-h-[150px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br ${gradient} p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50`}
+    >
+      {/* Decorative glow */}
+      <div className="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-white/20 blur-3xl transition-all duration-500 group-hover:scale-150" />
 
-        return (
-          <Card
-            key={suggestion.title}
-            className={`group cursor-pointer border-border/60 bg-gradient-to-br ${suggestion.gradient} p-5 transition-all duration-300 hover:-translate-y-1 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-500/10`}
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-background/80 shadow-sm">
-                <Icon className="size-5 text-violet-600 transition-transform duration-300 group-hover:scale-110 dark:text-violet-400" />
-              </div>
+      <div className="relative flex h-full flex-col justify-between">
+        <div className="flex items-start justify-between">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-white/70 shadow-sm backdrop-blur-sm dark:bg-black/20">
+            <Icon
+              className={`size-5 ${iconColor} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-4deg]`}
+            />
+          </div>
 
-              <div>
-                <h3 className="font-semibold">
-                  {suggestion.title}
-                </h3>
+          <div className="flex size-8 items-center justify-center rounded-full bg-white/50 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100 dark:bg-black/20">
+            <ArrowUpRight className="size-4" />
+          </div>
+        </div>
 
-                <p className="mt-1 text-sm leading-5 text-muted-foreground">
-                  {suggestion.description}
-                </p>
-              </div>
-            </div>
-          </Card>
-        );
-      })}
-    </div>
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold tracking-tight">
+            {title}
+          </h3>
+
+          <p className="mt-1.5 max-w-[240px] text-xs leading-5 text-muted-foreground">
+            {description}
+          </p>
+        </div>
+      </div>
+    </button>
   );
 }

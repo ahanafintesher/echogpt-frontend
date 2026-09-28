@@ -4,9 +4,9 @@ import { useState } from "react";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import ChatLayout from "./ChatLayout";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import type { Message } from "../components/chat/ChatMessages";
+import ChatLayout from "./ChatLayout";
 
 interface Chat {
   id: string;
@@ -116,12 +116,35 @@ export default function ChatPage() {
     setActiveChatId(chatId);
   };
 
-  const handleMessagesChange = (messages: Message[]) => {
-    if (!activeChatId) return;
+  const handleCreateChat = (messages: Message[]) => {
+    const firstUserMessage = messages.find(
+      (message) => message.role === "user",
+    );
 
+    const title =
+      firstUserMessage?.content.slice(0, 35) || "New Chat";
+
+    const newChat: Chat = {
+      id: crypto.randomUUID(),
+      title: title.length < (firstUserMessage?.content.length ?? 0)
+        ? `${title}...`
+        : title,
+      messages,
+    };
+
+    setChats((previousChats) => [newChat, ...previousChats]);
+    setActiveChatId(newChat.id);
+
+    return newChat.id;
+  };
+
+  const handleMessagesChange = (
+    chatId: string,
+    messages: Message[],
+  ) => {
     setChats((previousChats) =>
       previousChats.map((chat) =>
-        chat.id === activeChatId
+        chat.id === chatId
           ? {
               ...chat,
               messages,
@@ -131,9 +154,37 @@ export default function ChatPage() {
     );
   };
 
+  const handleRenameChat = (chatId: string, title: string) => {
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) return;
+
+    setChats((previousChats) =>
+      previousChats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              title: trimmedTitle,
+            }
+          : chat,
+      ),
+    );
+  };
+
+  const handleDeleteChat = (chatId: string) => {
+    setChats((previousChats) =>
+      previousChats.filter((chat) => chat.id !== chatId),
+    );
+
+    if (activeChatId === chatId) {
+      setActiveChatId(null);
+    }
+  };
+
   return (
     <SidebarProvider>
       <ChatSidebar
+        chats={chats}
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
         activeChatId={activeChatId}
@@ -141,9 +192,13 @@ export default function ChatPage() {
 
       <SidebarInset className="min-w-0">
         <ChatLayout
+          chatId={activeChatId}
           messages={activeChat?.messages ?? []}
-          onMessagesChange={handleMessagesChange}
           title={activeChat?.title ?? "New Chat"}
+          onCreateChat={handleCreateChat}
+          onMessagesChange={handleMessagesChange}
+          onRenameChat={handleRenameChat}
+          onDeleteChat={handleDeleteChat}
         />
       </SidebarInset>
     </SidebarProvider>

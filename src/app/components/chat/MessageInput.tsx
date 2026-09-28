@@ -21,9 +21,13 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-interface Attachment {
+export interface Attachment {
   id: string;
   file: File;
   previewUrl?: string;
@@ -179,7 +183,9 @@ export default function MessageInput({
                   ) : (
                     <Paperclip className="size-3.5 text-muted-foreground" />
                   )}
-                  <span className="max-w-32 truncate">{attachment.file.name}</span>
+                  <span className="max-w-32 truncate">
+                    {attachment.file.name}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(attachment.id)}
@@ -280,7 +286,10 @@ export default function MessageInput({
                     variant="ghost"
                     size="icon"
                     disabled={disabled}
-                    className="size-8 rounded-lg text-muted-foreground"
+                    onClick={() => {
+                      window.alert("Voice input is coming soon.");
+                    }}
+                    className="size-8 rounded-lg text-muted-foreground hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950/30"
                   >
                     <Mic className="size-4" />
                   </Button>

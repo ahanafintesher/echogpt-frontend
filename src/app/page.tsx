@@ -1,15 +1,36 @@
+import Features from "./components/landing/Features";
+import Models from "./components/landing/Models";
+import WhyEchoGPT from "./components/landing/WhyEchoGPT";
+import ExtensionShowcase from "./components/landing/ExtensionShowcase";
+import FAQ from "./components/landing/FAQ";
+import CTA from "./components/landing/CTA";
+import Footer from "./components/landing/Footer";
+import Hero from "./components/landing/Hero";
 import Navbar from "./components/navbar/navbar";
+import ProductReviews from "./components/landing/ProductPreview";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main id="top" className="min-h-screen">
       <Navbar />
 
-      <section className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
-        <h1 className="text-4xl font-bold">
-          EchoGPT
-        </h1>
-      </section>
+      <Hero />
+
+      <Features />
+
+      <Models />
+
+      <WhyEchoGPT />
+
+      <ExtensionShowcase />
+
+      <ProductReviews />
+
+      <FAQ />
+
+      <CTA />
+
+      <Footer />
     </main>
   );
 }

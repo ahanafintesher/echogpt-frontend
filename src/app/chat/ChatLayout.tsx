@@ -4,18 +4,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useSidebar } from "@/components/ui/sidebar";
 
-import AssistantMessage from "../components/chat/AssistantMessage";
 import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatMessages, {
   type Message,
 } from "../components/chat/ChatMessages";
-import MessageInput from "../components/chat/MessageInput";
+import MessageInput, {
+  type Attachment,
+} from "../components/chat/MessageInput";
 
 interface ChatLayoutProps {
+  chatId: string | null;
   messages: Message[];
-  onMessagesChange: (messages: Message[]) => void;
   title?: string;
+  onCreateChat: (messages: Message[]) => string;
+  onMessagesChange: (chatId: string, messages: Message[]) => void;
+  onRenameChat: (chatId: string, title: string) => void;
+  onDeleteChat: (chatId: string) => void;
 }
 
 const mockResponses = [
@@ -25,19 +30,30 @@ const mockResponses = [
 ];
 
 export default function ChatLayout({
+  chatId,
   messages,
-  onMessagesChange,
   title = "New Chat",
+  onCreateChat,
+  onMessagesChange,
+  onRenameChat,
+  onDeleteChat,
 }: ChatLayoutProps) {
   const [isTyping, setIsTyping] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
 
   const { toggleSidebar } = useSidebar();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const responseTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const responseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const activeChatIdRef = useRef<string | null>(chatId);
+  const messagesRef = useRef<Message[]>(messages);
+
+  useEffect(() => {
+    activeChatIdRef.current = chatId;
+    messagesRef.current = messages;
+  }, [chatId, messages]);
 
   const clearResponseTimeout = useCallback(() => {
     if (responseTimeoutRef.current) {
@@ -52,19 +68,31 @@ export default function ChatLayout({
     });
   }, [messages, isTyping]);
 
-  const handleStop = () => {
-    clearResponseTimeout();
-    setIsTyping(false);
+  const updateMessages = (
+    nextMessages: Message[],
+    targetChatId?: string,
+  ) => {
+    const id = targetChatId ?? activeChatIdRef.current;
+
+    if (!id) return;
+
+    messagesRef.current = nextMessages;
+
+    onMessagesChange(id, nextMessages);
   };
 
-  const generateResponse = (delay: number) => {
+  const generateResponse = (
+    currentMessages: Message[],
+    targetChatId: string,
+  ) => {
     clearResponseTimeout();
-
     setIsTyping(true);
 
     responseTimeoutRef.current = setTimeout(() => {
       const response =
-        mockResponses[Math.floor(Math.random() * mockResponses.length)];
+        mockResponses[
+          Math.floor(Math.random() * mockResponses.length)
+        ];
 
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
@@ -72,14 +100,27 @@ export default function ChatLayout({
         content: response,
       };
 
-      onMessagesChange([...messages, assistantMessage]);
+      const updatedMessages = [
+        ...currentMessages,
+        assistantMessage,
+      ];
+
+      updateMessages(updatedMessages, targetChatId);
 
       setIsTyping(false);
       responseTimeoutRef.current = null;
-    }, delay);
+    }, 1400);
   };
 
-  const handleSend = (content: string) => {
+  const handleStop = () => {
+    clearResponseTimeout();
+    setIsTyping(false);
+  };
+
+  const handleSend = (
+    content: string,
+    attachments: Attachment[] = [],
+  ) => {
     const trimmedContent = content.trim();
 
     if (!trimmedContent || isTyping) return;
@@ -88,13 +129,31 @@ export default function ChatLayout({
       id: crypto.randomUUID(),
       role: "user",
       content: trimmedContent,
+      attachments: attachments.map((attachment) => ({
+        name: attachment.file.name,
+        type: attachment.file.type,
+        size: attachment.file.size,
+      })),
     };
 
-    const updatedMessages = [...messages, userMessage];
+    const updatedMessages = [
+      ...messagesRef.current,
+      userMessage,
+    ];
 
-    onMessagesChange(updatedMessages);
+    let targetChatId = activeChatIdRef.current;
 
-    generateResponse(1400);
+    // Create a real chat when sending from "New Chat"
+    if (!targetChatId) {
+      targetChatId = onCreateChat(updatedMessages);
+      activeChatIdRef.current = targetChatId;
+    } else {
+      updateMessages(updatedMessages, targetChatId);
+    }
+
+    messagesRef.current = updatedMessages;
+
+    generateResponse(updatedMessages, targetChatId);
   };
 
   const handlePromptSelect = (prompt: string) => {
@@ -102,33 +161,68 @@ export default function ChatLayout({
   };
 
   const handleRegenerate = () => {
-    if (isTyping || messages.length === 0) return;
+    if (isTyping || messagesRef.current.length === 0) return;
 
-    const lastAssistantIndex = [...messages]
+    const currentMessages = messagesRef.current;
+
+    const lastAssistantIndex = [...currentMessages]
       .map((message) => message.role)
       .lastIndexOf("assistant");
 
     if (lastAssistantIndex === -1) return;
+
+    const targetChatId = activeChatIdRef.current;
+
+    if (!targetChatId) return;
 
     clearResponseTimeout();
     setIsTyping(true);
 
     responseTimeoutRef.current = setTimeout(() => {
       const response =
-        mockResponses[Math.floor(Math.random() * mockResponses.length)];
+        mockResponses[
+          Math.floor(Math.random() * mockResponses.length)
+        ];
 
-      const updatedMessages = [...messages];
+      const updatedMessages = [...currentMessages];
 
       updatedMessages[lastAssistantIndex] = {
         ...updatedMessages[lastAssistantIndex],
         content: response,
       };
 
-      onMessagesChange(updatedMessages);
+      updateMessages(updatedMessages, targetChatId);
 
       setIsTyping(false);
       responseTimeoutRef.current = null;
     }, 1200);
+  };
+
+  const handleRename = () => {
+    if (!chatId) return;
+
+    const newTitle = window.prompt(
+      "Rename conversation",
+      title,
+    );
+
+    if (!newTitle?.trim()) return;
+
+    onRenameChat(chatId, newTitle);
+  };
+
+  const handleDelete = () => {
+    if (!chatId) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this conversation?",
+    );
+
+    if (!confirmed) return;
+
+    clearResponseTimeout();
+    setIsTyping(false);
+    onDeleteChat(chatId);
   };
 
   useEffect(() => {
@@ -142,11 +236,16 @@ export default function ChatLayout({
       <ChatHeader
         title={title}
         onToggleSidebar={toggleSidebar}
+        onRename={handleRename}
+        onDelete={handleDelete}
+        messages={messages}
       />
 
       <main className="relative min-h-0 flex-1 overflow-y-auto">
         {messages.length === 0 ? (
-          <ChatEmptyState onPromptSelect={handlePromptSelect} />
+          <ChatEmptyState
+            onPromptSelect={handlePromptSelect}
+          />
         ) : (
           <>
             <ChatMessages
@@ -155,7 +254,10 @@ export default function ChatLayout({
               onRegenerate={handleRegenerate}
             />
 
-            <div ref={messagesEndRef} className="h-4" />
+            <div
+              ref={messagesEndRef}
+              className="h-4"
+            />
           </>
         )}
       </main>
@@ -164,6 +266,8 @@ export default function ChatLayout({
         onSend={handleSend}
         onStop={handleStop}
         isGenerating={isTyping}
+        webSearchEnabled={webSearchEnabled}
+        onToggleWebSearch={setWebSearchEnabled}
       />
     </div>
   );
