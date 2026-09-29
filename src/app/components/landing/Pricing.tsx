@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -252,16 +253,25 @@ export default function Pricing() {
                   )}
 
                   {/* Button */}
-                  <button
-                    type="button"
-                    className={`mt-7 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold transition-all ${
-                      plan.popular
-                        ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.01] hover:shadow-xl"
-                        : "border border-border/70 bg-muted/40 text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {plan.button}
-                  </button>
+                  {plan.name === "Free" ? (
+                    <Link
+                      href="/chat"
+                      className="mt-7 flex h-11 w-full items-center justify-center rounded-xl border border-border/70 bg-muted/40 text-sm font-semibold text-foreground transition-all hover:bg-muted"
+                    >
+                      {plan.button}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      className={`mt-7 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold transition-all ${
+                        plan.popular
+                          ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.01] hover:shadow-xl"
+                          : "border border-border/70 bg-muted/40 text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {plan.button}
+                    </button>
+                  )}
 
                   {/* Divider */}
                   <div className="my-7 h-px bg-border/60" />

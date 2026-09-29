@@ -1,6 +1,13 @@
-import { Sparkles } from "lucide-react";
-import SuggestionCards from "./SuggestionCard";
+"use client";
 
+import {
+  Code2,
+  ImageIcon,
+  Lightbulb,
+  Sparkles,
+} from "lucide-react";
+
+import SuggestionCard from "./SuggestionCard";
 
 export default function ChatWelcome() {
   return (
@@ -35,7 +42,39 @@ export default function ChatWelcome() {
         </div>
 
         {/* Suggestions */}
-        <SuggestionCards />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SuggestionCard
+            title="Brainstorm ideas"
+            description="Turn a simple thought into creative possibilities."
+            icon={Lightbulb}
+            gradient="from-amber-400/20 via-orange-400/10 to-rose-400/20"
+            iconColor="text-amber-500"
+          />
+
+          <SuggestionCard
+            title="Write something"
+            description="Create emails, stories, posts, and polished content."
+            icon={Sparkles}
+            gradient="from-violet-500/20 via-fuchsia-400/10 to-pink-400/20"
+            iconColor="text-fuchsia-500"
+          />
+
+          <SuggestionCard
+            title="Build with code"
+            description="Debug, explain, refactor, or build your next feature."
+            icon={Code2}
+            gradient="from-blue-500/20 via-cyan-400/10 to-indigo-400/20"
+            iconColor="text-blue-500"
+          />
+
+          <SuggestionCard
+            title="Create visuals"
+            description="Explore ideas for images, designs, and visual concepts."
+            icon={ImageIcon}
+            gradient="from-emerald-400/20 via-teal-400/10 to-cyan-400/20"
+            iconColor="text-emerald-500"
+          />
+        </div>
       </div>
     </section>
   );

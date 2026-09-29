@@ -228,10 +228,10 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} EchoGPT. All rights reserved.</p>
 
           <div className="flex items-center gap-5">
-            <span className="inline-flex items-center gap-1.5">
+            {/* <span className="inline-flex items-center gap-1.5">
               <Sparkles className="size-3 text-violet-500" aria-hidden />
               Made with AI
-            </span>
+            </span> */}
 
             <button
               type="button"
