@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 /* -------------------------------------------------------------------------- */
 /*                                    Data                                    */
@@ -232,6 +233,7 @@ export default function Hero() {
               variants={itemVariants}
               className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
             >
+             <Link href={"/chat"}>
               <Button
                 size="lg"
                 className="group h-12 w-full rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-500 px-6 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-violet-500/30 focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto"
@@ -240,6 +242,7 @@ export default function Hero() {
                 <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
 
+             </Link>
               <Button
                 size="lg"
                 variant="outline"
