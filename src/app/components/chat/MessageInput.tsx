@@ -28,8 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import ModelSelector from "../extensions/ModelSelector"; 
-
+import ModelSelector, { type ChatModel } from "./ModelSelector";
 export interface Attachment {
   id: string;
   file: File;

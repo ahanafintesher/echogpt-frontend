@@ -5,12 +5,13 @@ import {
   Brain,
   Check,
   ChevronDown,
+  Code2,
+  Globe2,
+  PenLine,
   Sparkles,
-  Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,14 +21,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export type ChatModel =
-  | "gpt-5.6"
-  | "gpt-5.6-fast"
-  | "claude"
-  | "gemini";
+export type ExtensionModel =
+  | "balanced"
+  | "reasoning"
+  | "code"
+  | "creative"
+  | "web";
 
 interface Model {
-  id: ChatModel;
+  id: ExtensionModel;
   name: string;
   description: string;
   icon: typeof Sparkles;
@@ -36,38 +38,45 @@ interface Model {
 
 const models: Model[] = [
   {
-    id: "gpt-5.6",
-    name: "GPT-5.6",
-    description: "Advanced & balanced",
+    id: "balanced",
+    name: "Balanced",
+    description: "Everyday AI assistance",
     icon: Sparkles,
     iconClass: "text-violet-500",
   },
   {
-    id: "gpt-5.6-fast",
-    name: "GPT-5.6 Fast",
-    description: "Fast responses",
-    icon: Zap,
+    id: "reasoning",
+    name: "Deep Thinking",
+    description: "Complex reasoning and analysis",
+    icon: Brain,
+    iconClass: "text-blue-500",
+  },
+  {
+    id: "code",
+    name: "Code",
+    description: "Programming and debugging",
+    icon: Code2,
     iconClass: "text-cyan-500",
   },
   {
-    id: "claude",
-    name: "Claude",
-    description: "Thoughtful & capable",
-    icon: Brain,
-    iconClass: "text-orange-500",
+    id: "creative",
+    name: "Creative",
+    description: "Writing and creative work",
+    icon: PenLine,
+    iconClass: "text-fuchsia-500",
   },
   {
-    id: "gemini",
-    name: "Gemini",
-    description: "Multimodal AI",
-    icon: Sparkles,
-    iconClass: "text-blue-500",
+    id: "web",
+    name: "Web",
+    description: "Search and web-aware answers",
+    icon: Globe2,
+    iconClass: "text-emerald-500",
   },
 ];
 
 interface ModelSelectorProps {
-  value?: ChatModel;
-  onChange?: (model: ChatModel) => void;
+  value?: ExtensionModel;
+  onChange?: (model: ExtensionModel) => void;
 }
 
 export default function ModelSelector({
@@ -75,84 +84,77 @@ export default function ModelSelector({
   onChange,
 }: ModelSelectorProps) {
   const [internalModel, setInternalModel] =
-    useState<ChatModel>("gpt-5.6");
+    useState<ExtensionModel>("balanced");
 
   const selectedId = value ?? internalModel;
 
   const selectedModel =
-    models.find((model) => model.id === selectedId) ??
-    models[0];
+    models.find((model) => model.id === selectedId) ?? models[0];
 
-  const handleSelect = (model: ChatModel) => {
+  const SelectedIcon = selectedModel.icon;
+
+  const handleSelect = (model: ExtensionModel) => {
     setInternalModel(model);
     onChange?.(model);
   };
-
-  const SelectedIcon = selectedModel.icon;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          type="button"
           variant="ghost"
-          size="sm"
-          className="h-8 max-w-[190px] gap-1.5 rounded-lg px-2 text-xs font-medium hover:bg-muted/70"
+          className="h-9 gap-2 rounded-xl px-3"
         >
           <SelectedIcon
-            className={`size-3.5 shrink-0 ${selectedModel.iconClass}`}
+            className={`size-4 ${selectedModel.iconClass}`}
           />
 
-          <span className="truncate">
+          <span className="text-sm font-medium">
             {selectedModel.name}
           </span>
 
-          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+          <ChevronDown className="size-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="start"
-        side="top"
-        sideOffset={8}
-        className="z-[100] w-64"
+        className="w-64 rounded-xl p-1"
       >
-        <DropdownMenuLabel>
-          Select AI model
+        <DropdownMenuLabel className="px-3 py-2 text-xs text-muted-foreground">
+          Select AI Model
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 
         {models.map((model) => {
           const Icon = model.icon;
-          const isSelected =
-            selectedModel.id === model.id;
 
           return (
             <DropdownMenuItem
               key={model.id}
-              onSelect={() =>
-                handleSelect(model.id)
-              }
-              className="flex cursor-pointer items-start gap-3 py-3"
+              onClick={() => handleSelect(model.id)}
+              className="cursor-pointer rounded-lg p-3"
             >
-              <Icon
-                className={`mt-0.5 size-4 shrink-0 ${model.iconClass}`}
-              />
+              <div className="flex w-full items-center gap-3">
+                <Icon
+                  className={`size-4 shrink-0 ${model.iconClass}`}
+                />
 
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="font-medium">
-                  {model.name}
-                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-sm font-medium">
+                    {model.name}
+                  </span>
 
-                <span className="text-xs text-muted-foreground">
-                  {model.description}
-                </span>
+                  <span className="text-xs text-muted-foreground">
+                    {model.description}
+                  </span>
+                </div>
+
+                {selectedId === model.id && (
+                  <Check className="size-4 text-violet-500" />
+                )}
               </div>
-
-              {isSelected && (
-                <Check className="mt-0.5 size-4 shrink-0 text-violet-500" />
-              )}
             </DropdownMenuItem>
           );
         })}

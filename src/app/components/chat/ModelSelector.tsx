@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Check, ChevronDown, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,62 +13,122 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const models = [
+export type ChatModel =
+  | "gpt-5.6"
+  | "gpt-5.6-fast"
+  | "claude"
+  | "gemini";
+
+interface Model {
+  id: ChatModel;
+  name: string;
+  description: string;
+  iconClass: string;
+}
+
+const models: Model[] = [
   {
-    name: "EchoGPT Pro",
-    description: "Best for complex tasks",
+    id: "gpt-5.6",
+    name: "GPT-5.6",
+    description: "Advanced & balanced",
+    iconClass: "text-violet-500",
   },
   {
-    name: "EchoGPT Fast",
+    id: "gpt-5.6-fast",
+    name: "GPT-5.6 Fast",
     description: "Fast responses",
+    iconClass: "text-cyan-500",
   },
   {
-    name: "EchoGPT Creative",
-    description: "Writing and creative work",
+    id: "claude",
+    name: "Claude",
+    description: "Thoughtful & capable",
+    iconClass: "text-orange-500",
+  },
+  {
+    id: "gemini",
+    name: "Gemini",
+    description: "Multimodal AI",
+    iconClass: "text-blue-500",
   },
 ];
 
-export default function ModelSelector() {
+interface ModelSelectorProps {
+  value?: ChatModel;
+  onChange?: (model: ChatModel) => void;
+}
+
+export default function ModelSelector({
+  value,
+  onChange,
+}: ModelSelectorProps) {
+  const [internalModel, setInternalModel] =
+    useState<ChatModel>("gpt-5.6");
+
+  const selectedId = value ?? internalModel;
+
+  const selectedModel =
+    models.find((model) => model.id === selectedId) ?? models[0];
+
+  const handleSelect = (model: ChatModel) => {
+    setInternalModel(model);
+    onChange?.(model);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-9 gap-2 px-2 font-medium"
+          className="h-9 gap-2 rounded-xl px-3"
         >
-          <Sparkles className="size-4" />
-          <span>EchoGPT Pro</span>
-          <ChevronDown className="size-4 text-muted-foreground" />
+          <Sparkles
+            className={`size-4 ${selectedModel.iconClass}`}
+          />
+
+          <span className="hidden text-sm font-medium sm:inline">
+            {selectedModel.name}
+          </span>
+
+          <ChevronDown className="size-3.5 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-64">
-        <DropdownMenuLabel>
-          Select model
+      <DropdownMenuContent
+        align="start"
+        className="w-64 rounded-xl p-1"
+      >
+        <DropdownMenuLabel className="px-3 py-2 text-xs text-muted-foreground">
+          Select AI Model
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 
         {models.map((model) => (
           <DropdownMenuItem
-            key={model.name}
-            className="flex items-start gap-3 py-3"
+            key={model.id}
+            onClick={() => handleSelect(model.id)}
+            className="cursor-pointer rounded-lg p-3"
           >
-            <Sparkles className="mt-0.5 size-4" />
+            <div className="flex w-full items-center gap-3">
+              <Sparkles
+                className={`size-4 shrink-0 ${model.iconClass}`}
+              />
 
-            <div className="flex flex-1 flex-col">
-              <span className="font-medium">
-                {model.name}
-              </span>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="text-sm font-medium">
+                  {model.name}
+                </span>
 
-              <span className="text-xs text-muted-foreground">
-                {model.description}
-              </span>
+                <span className="text-xs text-muted-foreground">
+                  {model.description}
+                </span>
+              </div>
+
+              {selectedId === model.id && (
+                <Check className="size-4 text-violet-500" />
+              )}
             </div>
-
-            {model.name === "EchoGPT Pro" && (
-              <Check className="size-4" />
-            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
